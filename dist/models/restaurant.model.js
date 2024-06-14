@@ -7,6 +7,7 @@ const restaurantSchema = new mongoose.Schema({
     restaurantCity: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "City",
+        required: true,
     },
     restaurantAddressLine1: {
         type: String,
@@ -24,6 +25,11 @@ const restaurantSchema = new mongoose.Schema({
         {
             type: String,
         }
-    ]
+    ],
+    restaurantOwner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    }
 }, { timestamps: true });
 export const Restaurant = mongoose.model('Restaurant', restaurantSchema);
