@@ -8,7 +8,6 @@ const citySchema = new mongoose.Schema({
         unique:true,
         lowercase:true,
     }
-
 },{timestamps:true});
 
 export const City = mongoose.model('City',citySchema);
