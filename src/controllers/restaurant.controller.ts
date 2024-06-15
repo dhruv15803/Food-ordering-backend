@@ -165,7 +165,7 @@ const getRestaurantFoodItems = async (req: Request, res: Response) => {
       });
       return;
     }
-    const foodItems = await FoodItem.find({ restaurantId: restaurant._id });
+    const foodItems = await FoodItem.find({ restaurantId: restaurant._id }).populate('foodItemCuisine');
     res.status(200).json({
       success: true,
       foodItems,
