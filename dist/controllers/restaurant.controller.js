@@ -2,6 +2,7 @@ import { getCloudinaryUrl } from "../utils/cloudinary.util.js";
 import { User } from "../models/user.model.js";
 import { Restaurant } from "../models/restaurant.model.js";
 import { City } from "../models/city.model.js";
+import { FoodItem } from "../models/foodItem.model.js";
 const getFileUrl = async (req, res) => {
     try {
         if (!req.file) {
@@ -50,11 +51,13 @@ const registerRestaurant = async (req, res) => {
             });
             return;
         }
-        const city = await City.findOne({ cityName: restaurantCity.trim().toLowerCase() });
+        const city = await City.findOne({
+            cityName: restaurantCity.trim().toLowerCase(),
+        });
         if (!city) {
             res.status(400).json({
-                "success": false,
-                "message": "city does not exist"
+                success: false,
+                message: "city does not exist",
             });
             return;
         }
@@ -76,4 +79,56 @@ const registerRestaurant = async (req, res) => {
         console.log(error);
     }
 };
-export { getFileUrl, registerRestaurant };
+const getMyRestaurants = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const user = await User.findById(userId);
+        if (!user) {
+            res.status(400).json({
+                success: false,
+                message: "userId not valid",
+            });
+            return;
+        }
+        const myRestaurants = await Restaurant.find({
+            restaurantOwner: user._id,
+        }).populate("restaurantCity");
+        res.status(200).json({
+            success: true,
+            myRestaurants,
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
+const getRestaurantFoodItems = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.userId;
+        const restaurant = await Restaurant.findOne({ _id: id });
+        if (!restaurant) {
+            res.status(400).json({
+                success: false,
+                message: "invalid restaurant id",
+            });
+            return;
+        }
+        if (String(restaurant.restaurantOwner) !== userId) {
+            res.status(400).json({
+                success: false,
+                message: "user is not authenticated for this restaurant",
+            });
+            return;
+        }
+        const foodItems = await FoodItem.find({ restaurantId: restaurant._id });
+        res.status(200).json({
+            success: true,
+            foodItems,
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
+export { getFileUrl, registerRestaurant, getMyRestaurants, getRestaurantFoodItems, };
