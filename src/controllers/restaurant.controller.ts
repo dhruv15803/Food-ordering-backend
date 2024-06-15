@@ -117,6 +117,35 @@ const getMyRestaurants = async (req: Request, res: Response) => {
   }
 };
 
+
+const getRestaurantById = async (req:Request,res:Response) => {
+  try {
+    const {restaurantId} = req.params;
+    const restaurant = await Restaurant.findOne({_id:restaurantId});
+    if(!restaurant) {
+      res.status(400).json({
+        "success":false,
+        "message":"restaurantId invalid"
+      })
+      return;
+    }
+    if(String(restaurant.restaurantOwner)!==req.userId) {
+      res.status(400).json({
+        "success":false,
+        "message":"User not authenticated"
+      })
+      return;
+    }
+    res.status(200).json({
+      "success":true,
+      restaurant,
+    })
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
 const getRestaurantFoodItems = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -151,4 +180,5 @@ export {
   registerRestaurant,
   getMyRestaurants,
   getRestaurantFoodItems,
+  getRestaurantById,
 };
