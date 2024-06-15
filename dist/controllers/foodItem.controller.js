@@ -60,4 +60,50 @@ const addFoodItem = async (req, res) => {
         console.log(error);
     }
 };
-export { addFoodItem };
+const deleteFoodItem = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const foodItem = await FoodItem.findOne({ _id: id });
+        if (!foodItem) {
+            res.status(400).json({
+                success: false,
+                message: "invalid food item id",
+            });
+            return;
+        }
+        await FoodItem.deleteOne({ _id: foodItem._id });
+        res.status(200).json({
+            success: true,
+            message: "successfully deleted food item",
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
+const updateFoodItem = async (req, res) => {
+    try {
+        const { newFoodItemName, newFoodItemDescription, newFoodItemCuisine, newFoodItemPrice, id, } = req.body;
+        const cuisine = await Cuisine.findOne({ cuisineName: newFoodItemCuisine });
+        if (!cuisine) {
+            res.status(400).json({
+                "success": false,
+                "message": "invalid item cuisine"
+            });
+            return;
+        }
+        await FoodItem.updateOne({ _id: id }, { $set: { foodItemName: newFoodItemName, foodItemDescription: newFoodItemDescription,
+                foodItemPrice: newFoodItemPrice, foodItemCuisine: cuisine._id
+            } });
+        const foodItem = await FoodItem.findOne({ _id: id }).populate('foodItemCuisine');
+        res.status(200).json({
+            "success": false,
+            "message": "successfully updated food item",
+            foodItem,
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
+export { addFoodItem, deleteFoodItem, updateFoodItem };
