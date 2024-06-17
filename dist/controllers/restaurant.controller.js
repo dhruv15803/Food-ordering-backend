@@ -158,4 +158,53 @@ const getRestaurantFoodItems = async (req, res) => {
         console.log(error);
     }
 };
-export { getFileUrl, registerRestaurant, getMyRestaurants, getRestaurantFoodItems, getRestaurantById, };
+const removeRestaurant = async (req, res) => {
+    const { id } = req.params;
+    // if the restaurant is deleted then the corresponding foodItems are also deleted
+    const restaurant = await Restaurant.findOne({ _id: id });
+    if (!restaurant) {
+        res.status(400).json({
+            "success": false,
+            "message": "invalid restaurant id"
+        });
+        return;
+    }
+    const userId = req.userId;
+    if (String(restaurant.restaurantOwner) !== userId) {
+        res.status(400).json({
+            "success": false,
+            "message": "user not owner of this restaurant"
+        });
+        return;
+    }
+    // deleting food items with restaurantId equal to id
+    await FoodItem.deleteMany({ restaurantId: restaurant._id });
+    await Restaurant.deleteOne({ _id: restaurant._id });
+    res.status(200).json({
+        "success": true,
+        "message": "successfully removed restaurant and its menu items"
+    });
+    return;
+};
+const getRestaurantsByCity = async (req, res) => {
+    try {
+        const { restaurantCity } = req.params;
+        const city = await City.findOne({ cityName: restaurantCity });
+        if (!city) {
+            res.status(400).json({
+                "success": false,
+                "message": "invalid city name"
+            });
+            return;
+        }
+        const restaurants = await Restaurant.find({ restaurantCity: city._id }).populate('restaurantCity');
+        res.status(200).json({
+            "success": true,
+            restaurants,
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
+export { getFileUrl, registerRestaurant, getMyRestaurants, getRestaurantFoodItems, getRestaurantById, removeRestaurant, getRestaurantsByCity, };
