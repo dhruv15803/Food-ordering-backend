@@ -121,7 +121,7 @@ const getMyRestaurants = async (req: Request, res: Response) => {
 const getRestaurantById = async (req:Request,res:Response) => {
   try {
     const {restaurantId} = req.params;
-    const restaurant = await Restaurant.findOne({_id:restaurantId});
+    const restaurant = await Restaurant.findOne({_id:restaurantId}).populate('restaurantCity');
     if(!restaurant) {
       res.status(400).json({
         "success":false,

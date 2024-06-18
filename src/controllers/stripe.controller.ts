@@ -27,7 +27,7 @@ const createCheckoutSession  = async (req:Request,res:Response) => {
             line_items:lineItems,
             mode:"payment",
             success_url:`${process.env.CLIENT_URL}/success`,
-            cancel_url:`${process.env.CLIENT_URL}`
+            cancel_url:`${process.env.CLIENT_URL}/restaurant/results/menu/${restaurantId}`
         });
         if(!session) {
             res.status(500).json({
