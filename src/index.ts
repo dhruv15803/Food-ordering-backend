@@ -7,6 +7,7 @@ import { connectToDb } from './db/db.js'
 import adminRoutes from './routes/admin.routes.js'
 import foodItemRoutes from './routes/foodItem.routes.js'
 import restaurantRoutes from './routes/restaurant.routes.js'
+import stripeRoutes from './routes/stripe.routes.js'
 const app = express();
 const port = process.env.PORT;
 
@@ -26,6 +27,7 @@ app.use('/api/auth',authRoutes);
 app.use('/api/admin',adminRoutes);
 app.use('/api/restaurant',restaurantRoutes);
 app.use('/api/foodItem',foodItemRoutes);
+app.use('/api/stripe',stripeRoutes);
 
 
 app.listen(port,() => {
