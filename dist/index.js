@@ -16,8 +16,9 @@ app.use(cors({
     origin: process.env.CLIENT_URL,
     credentials: true,
 }));
-app.use(express.json());
 app.use(cookieParser());
+app.use("api/order/checkout/webhook", express.raw({ type: "*/*" }));
+app.use(express.json());
 // routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);

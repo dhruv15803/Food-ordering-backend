@@ -111,7 +111,7 @@ const getMyRestaurants = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       myRestaurants,
-    });
+    }); 
   } catch (error) {
     console.log(error);
   }
@@ -129,13 +129,6 @@ const getRestaurantById = async (req:Request,res:Response) => {
       })
       return;
     }
-    if(String(restaurant.restaurantOwner)!==req.userId) {
-      res.status(400).json({
-        "success":false,
-        "message":"User not authenticated"
-      })
-      return;
-    }
     res.status(200).json({
       "success":true,
       restaurant,
@@ -149,19 +142,11 @@ const getRestaurantById = async (req:Request,res:Response) => {
 const getRestaurantFoodItems = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const userId = req.userId;
     const restaurant = await Restaurant.findOne({ _id: id });
     if (!restaurant) {
       res.status(400).json({
         success: false,
         message: "invalid restaurant id",
-      });
-      return;
-    }
-    if (String(restaurant.restaurantOwner) !== userId) {
-      res.status(400).json({
-        success: false,
-        message: "user is not authenticated for this restaurant",
       });
       return;
     }

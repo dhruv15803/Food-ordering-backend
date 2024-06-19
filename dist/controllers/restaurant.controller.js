@@ -113,13 +113,6 @@ const getRestaurantById = async (req, res) => {
             });
             return;
         }
-        if (String(restaurant.restaurantOwner) !== req.userId) {
-            res.status(400).json({
-                "success": false,
-                "message": "User not authenticated"
-            });
-            return;
-        }
         res.status(200).json({
             "success": true,
             restaurant,
@@ -132,19 +125,11 @@ const getRestaurantById = async (req, res) => {
 const getRestaurantFoodItems = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.userId;
         const restaurant = await Restaurant.findOne({ _id: id });
         if (!restaurant) {
             res.status(400).json({
                 success: false,
                 message: "invalid restaurant id",
-            });
-            return;
-        }
-        if (String(restaurant.restaurantOwner) !== userId) {
-            res.status(400).json({
-                success: false,
-                message: "user is not authenticated for this restaurant",
             });
             return;
         }
