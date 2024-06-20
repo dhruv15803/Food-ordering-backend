@@ -31,7 +31,7 @@ const createCheckoutSession = async (req: Request, res: Response) => {
     const lineItems = cart.map((cartItem) => {
       return {
         price_data: {
-          currency: "usd",
+          currency: "inr",
           unit_amount: cartItem.cartItemPrice * 100,
           product_data: {
             name: cartItem.cartItemName,
@@ -56,7 +56,6 @@ const createCheckoutSession = async (req: Request, res: Response) => {
       });
       return;
     }
-    // creating a order with status placed
     const order = await Order.create({
       restaurant: restaurant._id,
       orderTotal: total,
@@ -73,10 +72,13 @@ const createCheckoutSession = async (req: Request, res: Response) => {
     const session = await stripe.checkout.sessions.create({
       line_items: lineItems,
       mode: "payment",
-      payment_method_types:["card"],
+      metadata:{
+        orderId:String(order._id),
+      },
       success_url: `${process.env.CLIENT_URL}/success`,
       cancel_url: `${process.env.CLIENT_URL}/restaurant/results/menu/${restaurantId}`,
     });
+    // creating a order with status placed
     if (!session) {
       res.status(500).json({
         success: false,
@@ -103,12 +105,13 @@ const fullfillOrder = async (req: Request, res: Response) => {
       sig as string,
       process.env.STRIPE_WEBHOOK_SECRET as string
     );
-  } catch (error) {
+  } catch (error:any) {
     console.log(error);
-    return;
+    return res.status(400).send(`Webhook error: ${error.message}`)
   }
   if (event?.type === "checkout.session.completed") {
     const order = await Order.findById(event.data.object.metadata?.orderId);
+    console.log('Webhook endpoint');
     if (!order) {
       res.status(400).json({
         success: false,
@@ -116,6 +119,7 @@ const fullfillOrder = async (req: Request, res: Response) => {
       });
       return;
     }
+    console.log('Order found');
     await Order.updateOne(
       { _id: order?._id },
       {
@@ -125,6 +129,7 @@ const fullfillOrder = async (req: Request, res: Response) => {
         },
       }
     );
+    console.log('Order updated');
   }
   res.status(200).send();
 };

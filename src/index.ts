@@ -8,6 +8,8 @@ import adminRoutes from './routes/admin.routes.js'
 import foodItemRoutes from './routes/foodItem.routes.js'
 import restaurantRoutes from './routes/restaurant.routes.js'
 import stripeRoutes from './routes/stripe.routes.js'
+import orderRoutes from './routes/order.routes.js'
+
 const app = express();
 const port = process.env.PORT;
 
@@ -20,7 +22,7 @@ app.use(cors({
     credentials:true,
 }))
 app.use(cookieParser());
-app.use("api/order/checkout/webhook",express.raw({type:"*/*"}));
+app.use("/api/stripe/checkout/webhook",express.raw({ type: "*/*" }))
 app.use(express.json());
 
 // routes
@@ -29,6 +31,7 @@ app.use('/api/admin',adminRoutes);
 app.use('/api/restaurant',restaurantRoutes);
 app.use('/api/foodItem',foodItemRoutes);
 app.use('/api/stripe',stripeRoutes);
+app.use('/api/orders',orderRoutes);
 
 
 app.listen(port,() => {
