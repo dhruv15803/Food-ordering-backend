@@ -53,7 +53,7 @@ const createCheckoutSession = async (req, res) => {
             metadata: {
                 orderId: String(order._id),
             },
-            success_url: `${process.env.CLIENT_URL}/success`,
+            success_url: `${process.env.CLIENT_URL}/orders`,
             cancel_url: `${process.env.CLIENT_URL}/restaurant/results/menu/${restaurantId}`,
         });
         // creating a order with status placed
