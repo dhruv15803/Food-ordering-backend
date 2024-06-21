@@ -54,7 +54,7 @@ const getRestaurantOrders = async (req, res) => {
             });
             return;
         }
-        const restaurantOrders = await Order.find({ restaurant: restaurant._id });
+        const restaurantOrders = await Order.find({ restaurant: restaurant._id }).populate('restaurant');
         res.status(200).json({
             "success": true,
             restaurantOrders,
@@ -64,4 +64,35 @@ const getRestaurantOrders = async (req, res) => {
         console.log(error);
     }
 };
-export { getMyOrders, getUserOrder, getRestaurantOrders, };
+const updateOrderStatus = async (req, res) => {
+    try {
+        const { id, orderStatus } = req.body;
+        const order = await Order.findOne({ _id: id });
+        if (!order) {
+            return res.status(400).json({
+                "success": false,
+                "message": "invalid order id"
+            });
+        }
+        const userId = req.userId;
+        const restaurantId = order.restaurant;
+        const restaurant = await Restaurant.findOne({ _id: restaurantId });
+        if (String(restaurant?.restaurantOwner) !== userId) {
+            res.status(400).json({
+                "success": false,
+                "message": "user is not the restaurant owner"
+            });
+            return;
+        }
+        await Order.updateOne({ _id: order._id }, { $set: { orderStatus: orderStatus } });
+        const updatedOrder = await Order.findOne({ _id: order._id }).populate('restaurant');
+        res.status(200).json({
+            "success": true,
+            updatedOrder,
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
+export { getMyOrders, getUserOrder, getRestaurantOrders, updateOrderStatus, };
