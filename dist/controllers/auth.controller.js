@@ -114,7 +114,7 @@ const logoutUser = (req, res) => {
     res.clearCookie('accessToken', {
         httpOnly: true,
         secure: true,
-        sameSite: 'none'
+        sameSite: "lax"
     }).json({
         "success": true,
         "message": "successfully logged out"
