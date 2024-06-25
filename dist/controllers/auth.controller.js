@@ -111,7 +111,11 @@ const logoutUser = (req, res) => {
         });
         return;
     }
-    res.clearCookie('accessToken').json({
+    res.clearCookie('accessToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none'
+    }).json({
         "success": true,
         "message": "successfully logged out"
     });
